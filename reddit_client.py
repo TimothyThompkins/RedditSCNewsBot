@@ -47,7 +47,7 @@ def __login(reddit_object,_user = USERNAME, _pass = PASSWORD):
         print "Login Failed. Threw an %s error. Retrying in %s seconds : %s \n" % \
         (message, str(login_wait_period), time.asctime( time.localtime(time.time()) ))
         time.sleep(login_wait_period)
-        __login(reddit_object,_user = user_name, _pass = password)
+        __login(reddit_object,_user = USERNAME, _pass = PASSWORD)
 
 #Prints out the execption error and returns the class from which it came.
 def __exception_message():
