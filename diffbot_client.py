@@ -11,6 +11,7 @@ import requests
 from bs4 import BeautifulSoup
 from heroku_deployment import herokuDeployment
 
+#If this fails below the app should quit itself
 h = herokuDeployment()
 
 if h.local_deployment is True:
@@ -71,7 +72,6 @@ class diffbotClient(object):
                     text += '\n'
             return text
 
-        #article_text = json_data['objects'][0]['text'] #Gets the text parameter from the list objects
         article_html = json_data['objects'][0]['html'] #Gets the text parameter from the list objects
 
         soup = BeautifulSoup(article_html)

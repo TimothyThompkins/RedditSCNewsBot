@@ -12,17 +12,6 @@ import praw
 from reddit_post import redditPost
 from heroku_deployment import herokuDeployment
 
-h = herokuDeployment()
-
-if h.local_deployment is True:
-    file = open('reddit_credentials.txt', 'r')
-    USERNAME = file.readline().strip() #Read first line
-    PASSWORD = file.readline().strip() #Read second line
-
-else:
-    USERNAME = ''
-    PASSWORD = ''
-
 execution_interval = 300 #This is the time in seconds between execution. If this is too low we will double comment because as reddit is adding our comment, we're checking again to see if it's there
 comment_rate_limit = 20 #This is the time in seconds the bot waits before trying to post annother comment.
 post_analyze_limit = 10 #This is the number of posts we want to look at for each call
@@ -33,12 +22,30 @@ user_agent = "South Carolina News Content Commenter : v1.0 (by /u/a_soy_milkshak
 #subreddit_of_interest = 'southcarolina'
 subreddit_of_interest = 'SCNewsHelper' #Use this subreddit to test
 
+# Gets the login credentials from either locally or remotely depending on deployment
+def __get_login_credentials():
+    h = herokuDeployment()
+
+    if h.local_deployment is True:
+        file = open('reddit_credentials.txt', 'r')
+        USERNAME = file.readline().strip() #Read first line
+        PASSWORD = file.readline().strip() #Read second line
+
+    else:
+        USERNAME = ''
+        PASSWORD = ''
+
+    return (USERNAME, PASSWORD)
+
 #Logs user into reddit. This is required if you're going to be commenting.
-def __login(reddit_object,_user = USERNAME, _pass = PASSWORD):
+def __login(reddit_object):
+
+    USERNAME, PASSWORD = __get_login_credentials()
 
     try:
-        print "Logging in to reddit as {0} : {1} \n".format(_user, time.asctime( time.localtime(time.time()) ))
-        reddit_object.login(username=_user, password=_pass)
+        print "Logging in to reddit as {0} : {1} \n".format(USERNAME, time.asctime( time.localtime(time.time()) ))
+        reddit_object.login(username=USERNAME, password=PASSWORD)
+        return USERNAME
 
     except:
         message = __exception_message()
@@ -47,7 +54,7 @@ def __login(reddit_object,_user = USERNAME, _pass = PASSWORD):
         print "Login Failed. Threw an %s error. Retrying in %s seconds : %s \n" % \
         (message, str(login_wait_period), time.asctime( time.localtime(time.time()) ))
         time.sleep(login_wait_period)
-        __login(reddit_object,_user = USERNAME, _pass = PASSWORD)
+        __login(reddit_object)
 
 #Prints out the execption error and returns the class from which it came.
 def __exception_message():
@@ -61,7 +68,7 @@ def __add_analyzed_post_id(post_id):
     if post_id not in analyzed_posts:
         analyzed_posts.append(post_id)
 
-def __add_new_comment(reddit_object, subreddit, post_analyze_limit):
+def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
     reddit_post_submissions = []
 
     print "Pulling last %s newest posts from /r/%s : %s \n" % \
@@ -84,7 +91,7 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit):
     if (len(reddit_post_submissions) > 0):
 
         for i, current_post in enumerate(reddit_post_submissions):
-            article_content = current_post.check_comment_status(USERNAME)
+            article_content = current_post.check_comment_status(username)
 
             if article_content is not None:
                 print "Attempting to add comment to post with post id: %s : %s" % \
@@ -133,11 +140,11 @@ def main():
 
     r = praw.Reddit(user_agent) #This creates a new reddit object
     subreddit = r.get_subreddit(subreddit_of_interest)
-    __login(r)
+    username = __login(r)
 
     while True:
         #Add a try statement here eventually to handle exceptions TMT
-        __add_new_comment(r, subreddit, post_analyze_limit)
+        __add_new_comment(r, subreddit, post_analyze_limit, username)
         print "Execution End. Waiting %s seconds before next execution : %s \n" % \
         (str(execution_interval), time.asctime( time.localtime(time.time()) ))
         print "_________________________________________________________________" + "\n"
