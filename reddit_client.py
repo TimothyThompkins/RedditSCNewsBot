@@ -32,8 +32,8 @@ def __get_login_credentials():
         PASSWORD = file.readline().strip() #Read second line
 
     else:
-        USERNAME = ''
-        PASSWORD = ''
+        USERNAME = os.environ['USERNAME']
+        PASSWORD = os.environ['PASSWORD']
 
     return (USERNAME, PASSWORD)
 

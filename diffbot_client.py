@@ -19,7 +19,7 @@ if h.local_deployment is True:
     diffbot_api_token = file.readline().strip() #Reads first line
 
 else:
-    diffbot_api_token = ''
+    diffbot_api_token = os.environ['diffbot_api_token']
 
 
 class diffbotClient(object):
