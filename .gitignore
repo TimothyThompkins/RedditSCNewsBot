@@ -42,5 +42,5 @@ Thumbs.db
 
 # Project Specific Files #
 ############
-diffbot_api_key.py
-reddit_credentials.py
+diffbot_api_token.txt
+reddit_credentials.txt

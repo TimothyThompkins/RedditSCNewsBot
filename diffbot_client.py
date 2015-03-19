@@ -8,8 +8,16 @@ import requests
 import json
 import types
 import time
-from diffbot_api_key import diffbot_api_token
 from bs4 import BeautifulSoup
+
+if heroku_deployment = False:
+    USERNAME = datafile_lines[0].strip()
+    PASSWORD = datafile_lines[1].strip()
+
+else:
+    USERNAME = datafile_lines[0].strip()
+    PASSWORD = datafile_lines[1].strip()
+
 
 class diffbotClient(object):
 

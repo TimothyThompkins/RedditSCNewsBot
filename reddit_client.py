@@ -14,10 +14,17 @@ import time
 import sys
 import threading
 from reddit_post import redditPost
-from reddit_credentials import user_name
-from reddit_credentials import password
 
-heroku_deployment = False #This determines if our app is being run locally or on heroku. If it's on heroku we'll want to act differently than local execution.
+global heroku_deployment = False #This determines if our app is being run locally or on heroku. This affects how we get tokens and login credentials
+
+if heroku_deployment = False:
+    USERNAME = datafile_lines[0].strip()
+    PASSWORD = datafile_lines[1].strip()
+
+else:
+    USERNAME = datafile_lines[0].strip()
+    PASSWORD = datafile_lines[1].strip()
+
 
 execution_interval = 300 #This is the time in seconds between execution. If this is too low we will double comment because as reddit is adding our comment, we're checking again to see if it's there
 comment_rate_limit = 20 #This is the time in seconds the bot waits before trying to post annother comment.
@@ -28,7 +35,7 @@ rate_limit_error = 'RateLimitExceeded'
 user_agent = "South Carolina News Content Commenter:v1.0 (by /u/SCNewsHelper)" #This is our user_agent we use to access reddit
 
 #Logs user into reddit. This is required if you're going to be commenting.
-def __login(reddit_object,_user = user_name, _pass = password):
+def __login(reddit_object,_user = USERNAME, _pass = PASSWORD):
 
     try:
         print "Logging in to reddit as {0} : {1} \n".format(_user, time.asctime( time.localtime(time.time()) ))
@@ -78,7 +85,7 @@ def add_new_comment(reddit_object, subreddit, post_analyze_limit):
     if (len(reddit_post_submissions) > 0):
 
         for i, current_post in enumerate(reddit_post_submissions):
-            article_content = current_post.check_comment_status()
+            article_content = current_post.check_comment_status(USERNAME)
 
             if article_content is not None:
                 print "Attempting to add comment to post with post id: %s : %s" % \
@@ -130,18 +137,14 @@ def main():
     #subreddit = r.get_subreddit('SCNewsHelper') #Use this subreddit to test.
     __login(r)
 
-    if heroku_deployment is False:
-
-        while True:
-            #Add a try statement here eventually to handle exceptions TMT
-            add_new_comment(r, subreddit, post_analyze_limit)
-            print "Execution End. Waiting %s seconds before next execution : %s \n" % \
-            (str(execution_interval), time.asctime( time.localtime(time.time()) ))
-            print "_________________________________________________________________" + "\n"
-            time.sleep(execution_interval)
-
-    else:
+    while True:
+        #Add a try statement here eventually to handle exceptions TMT
         add_new_comment(r, subreddit, post_analyze_limit)
+        print "Execution End. Waiting %s seconds before next execution : %s \n" % \
+        (str(execution_interval), time.asctime( time.localtime(time.time()) ))
+        print "_________________________________________________________________" + "\n"
+        time.sleep(execution_interval)
+
 
 
 if __name__ == '__main__':

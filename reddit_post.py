@@ -7,7 +7,6 @@
 import time
 from urlparse import urlparse
 from diffbot_client import diffbotClient
-from reddit_credentials import user_name
 
 relevant_flair= ['news' , 'sports']
 
@@ -35,7 +34,7 @@ class redditPost:
         print self.post_id
 
     #Determines if comment can be added to post. If so returns readability information
-    def check_comment_status(self):
+    def check_comment_status(self, USERNAME):
         comment_author = []
         readability_data = [] #Will contain content and wordcount of article
         has_relevant_flair = self.post_flair in relevant_flair
@@ -72,7 +71,7 @@ class redditPost:
                 comment_author.append(str(comment_individual.author))
 
             #Check here to see if bot user name is in list of comment authors in post
-            if user_name not in comment_author:
+            if USERNAME not in comment_author:
                 reddit_comment_content = self.set_comment_content()
                 print "Comment content set : " + time.asctime( time.localtime(time.time()) )
                 return reddit_comment_content
