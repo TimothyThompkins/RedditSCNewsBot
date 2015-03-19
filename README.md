@@ -8,13 +8,13 @@ Note that the api token and reddit user login credentials are stored in separate
 Non standard packages include (all installed using pip):
 
 Praw:
-'''
+```
 pip install praw
-'''
+```
 
 BeautifulSoup4:
-'''
+```
 pip install beautifulsoup4
-'''
+```
 
 This code is completely open source and free to be modified by anyone. Please direct questions, comments, and concerns to reddit.com/u/a_soy_milkshake.
