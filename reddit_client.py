@@ -7,6 +7,7 @@
 import sys
 import threading
 import time
+import os
 
 import praw
 from reddit_post import redditPost
