@@ -1,1 +1,1 @@
-worker: reddit_client.py
+worker: python reddit_client.py
