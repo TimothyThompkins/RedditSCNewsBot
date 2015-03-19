@@ -5,10 +5,12 @@ It functions by looking at the 10 most recent posts and checks to see if they ei
 
 Note that the api token and reddit user login credentials are stored in separate files.
 
-Non standard packages include:
+Non standard packages include (all installed using pip):
 
-1) Praw
+Praw:
+'''pip install praw'''
 
-2) BeautifulSoup4
+BeautifulSoup4:
+'''pip install beautifulsoup4'''
 
 This code is completely open source and free to be modified by anyone. Please direct questions, comments, and concerns to reddit.com/u/a_soy_milkshake.
