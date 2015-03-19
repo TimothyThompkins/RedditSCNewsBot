@@ -73,19 +73,16 @@ class redditPost:
             #Check here to see if bot user name is in list of comment authors in post
             if USERNAME not in comment_author:
                 reddit_comment_content = self.set_comment_content()
-                print "Comment content set : " + time.asctime( time.localtime(time.time()) )
+                print "Comment content set. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
                 return reddit_comment_content
 
             else:
-                print "No comment content set. This bot has already commented once : " + time.asctime( time.localtime(time.time()) )
-                print "Post ID: {0} Post URL: {1}".format(self.post_id, self.post_url)
+                print "No comment content set. This bot has already commented once. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
                 reddit_comment_content = None
                 return reddit_comment_content
 
         else:
-            print "No comment content set. Wrong flair, news source is not approved, or news source is flagged as bad : " + time.asctime( time.localtime(time.time()) )
-            print "Post ID: {0} Post URL: {1}".format(self.post_id, self.post_url)
-            #print "We cannot comment because it doesn't have the !\n"
+            print "No comment content set. Wrong flair, news source is not approved, or news source is flagged as bad. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
             reddit_comment_content = None
             return reddit_comment_content
 
@@ -117,14 +114,14 @@ class redditPost:
                 return my_comment_content
 
         elif (len(article_text) < character_post_min):
-            print "Comment character count less than %s : %s" % \
-            (str(character_post_min), time.asctime( time.localtime(time.time()) ))
+            print "Comment character count less than %s. Post ID: %s : %s" % \
+            (str(character_post_min), str(self.post_id), time.asctime( time.localtime(time.time()) ))
             my_comment_content = None
             return my_comment_content
 
         else:
-            print "Comment character count greater than %s : %s" % \
-            (str(character_post_max), time.asctime( time.localtime(time.time()) ))
+            print "Comment character count greater than %s. Post ID: %s : %s" % \
+            (str(character_post_max), str(self.post_id), time.asctime( time.localtime(time.time()) ))
             my_comment_content = None
             return my_comment_content
 

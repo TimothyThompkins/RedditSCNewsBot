@@ -1,10 +1,12 @@
 # RedditSCNewsBot
 
 ## Description
-This is a reddit bot that posts the content of news articles submitted to reddit.com/r/SouthCarolina as a comment on the post in an effort to make the content more accessible for those with slow internet connections and those that are reading on mobile. It is also makes an attempt to avoid pay walls and welcome webpages.
+This is a reddit bot that posts the content of news articles submitted to http://reddit.com/r/SouthCarolina as a comment on the post in an effort to make the content more accessible for those with slow internet connections and those that are reading on mobile. It is also makes an attempt to avoid pay walls and welcome webpages.
 
 Please direct questions, comments, and concerns to http://reddit.com/u/a_soy_milkshake.
 The open source code is found at https://github.com/TimothyThompkins/RedditSCNewsBot
+
+This bot is deployed on heroku.
 
 
 ## Functionality
