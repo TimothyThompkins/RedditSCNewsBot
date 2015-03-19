@@ -1,11 +1,11 @@
-#reddit_post.py
-#a_soy_milkshake
-#March 2015
+# reddit_post.py
+# a_soy_milkshake
 
-#This function checks our posts and determines if we should comment
+# This function checks our posts and determines if we should comment
 
 import time
 from urlparse import urlparse
+
 from diffbot_client import diffbotClient
 
 relevant_flair= ['news' , 'sports']

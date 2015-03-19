@@ -1,30 +1,27 @@
-#SCNewsHelper.py
-#a_soy_milkshake
-#March 2015
+# SCNewsHelper.py
+# a_soy_milkshake
 
 # This is the main function that is the "reddit bot". This code connects to reddit, pulls content, posts comments, etc...
 # This reddit bot has username /u/SCNewsHelper
 
-# Possible Imporvements:
-# 1. More robust exception and error handling
-# 2. Add timer for RateLimitExceeded Error and add post on which that error was called to a queue to be posted later. Best accomplished with multi-threading.
-
-import praw
-import time
 import sys
 import threading
+import time
+
+import praw
 from reddit_post import redditPost
+from heroku_deployment import herokuDeployment
 
-global heroku_deployment = False #This determines if our app is being run locally or on heroku. This affects how we get tokens and login credentials
+h = herokuDeployment()
 
-if heroku_deployment = False:
-    USERNAME = datafile_lines[0].strip()
-    PASSWORD = datafile_lines[1].strip()
+if h.local_deployment is True:
+    file = open('reddit_credentials.txt', 'r')
+    USERNAME = file.readline().strip() #Read first line
+    PASSWORD = file.readline().strip() #Read second line
 
 else:
-    USERNAME = datafile_lines[0].strip()
-    PASSWORD = datafile_lines[1].strip()
-
+    USERNAME = ''
+    PASSWORD = ''
 
 execution_interval = 300 #This is the time in seconds between execution. If this is too low we will double comment because as reddit is adding our comment, we're checking again to see if it's there
 comment_rate_limit = 20 #This is the time in seconds the bot waits before trying to post annother comment.
@@ -32,7 +29,9 @@ post_analyze_limit = 10 #This is the number of posts we want to look at for each
 
 analyzed_posts = [] #This array holds the post ids of posts that we tried to add comments to but failed (either b/c of an exception or we have already commented). We keep this to stop from calling the API too many times if we've already failed, or to stop from the coninual retrial to add a comment. The only exceiption to this should be if we are rate limited.
 rate_limit_error = 'RateLimitExceeded'
-user_agent = "South Carolina News Content Commenter:v1.0 (by /u/SCNewsHelper)" #This is our user_agent we use to access reddit
+user_agent = "South Carolina News Content Commenter : v1.0 (by /u/a_soy_milkshake)" #This is our user_agent we use to access reddit
+#subreddit_of_interest = 'southcarolina'
+subreddit_of_interest = 'SCNewsHelper' #Use this subreddit to test
 
 #Logs user into reddit. This is required if you're going to be commenting.
 def __login(reddit_object,_user = USERNAME, _pass = PASSWORD):
@@ -62,7 +61,7 @@ def __add_analyzed_post_id(post_id):
     if post_id not in analyzed_posts:
         analyzed_posts.append(post_id)
 
-def add_new_comment(reddit_object, subreddit, post_analyze_limit):
+def __add_new_comment(reddit_object, subreddit, post_analyze_limit):
     reddit_post_submissions = []
 
     print "Pulling last %s newest posts from /r/%s : %s \n" % \
@@ -133,13 +132,12 @@ def add_new_comment(reddit_object, subreddit, post_analyze_limit):
 def main():
 
     r = praw.Reddit(user_agent) #This creates a new reddit object
-    subreddit = r.get_subreddit('southcarolina')
-    #subreddit = r.get_subreddit('SCNewsHelper') #Use this subreddit to test.
+    subreddit = r.get_subreddit(subreddit_of_interest)
     __login(r)
 
     while True:
         #Add a try statement here eventually to handle exceptions TMT
-        add_new_comment(r, subreddit, post_analyze_limit)
+        __add_new_comment(r, subreddit, post_analyze_limit)
         print "Execution End. Waiting %s seconds before next execution : %s \n" % \
         (str(execution_interval), time.asctime( time.localtime(time.time()) ))
         print "_________________________________________________________________" + "\n"

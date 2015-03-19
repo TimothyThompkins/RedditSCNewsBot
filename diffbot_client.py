@@ -1,22 +1,24 @@
-#diffbot_client.py
-#a_soy_milkshake
-#March 2015
+# diffbot_client.py
+# a_soy_milkshake
 
-#This is the diffbot client that sends requests to api.diffbot.com
+# This is the diffbot client that sends requests to api.diffbot.com
 
-import requests
 import json
 import types
 import time
-from bs4 import BeautifulSoup
 
-if heroku_deployment = False:
-    USERNAME = datafile_lines[0].strip()
-    PASSWORD = datafile_lines[1].strip()
+import requests
+from bs4 import BeautifulSoup
+from heroku_deployment import herokuDeployment
+
+h = herokuDeployment()
+
+if h.local_deployment is True:
+    file = open('diffbot_api_token.txt', 'r')
+    diffbot_api_token = file.readline().strip() #Reads first line
 
 else:
-    USERNAME = datafile_lines[0].strip()
-    PASSWORD = datafile_lines[1].strip()
+    diffbot_api_token = ''
 
 
 class diffbotClient(object):
