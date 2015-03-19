@@ -17,6 +17,8 @@ from reddit_post import redditPost
 from reddit_credentials import user_name
 from reddit_credentials import password
 
+heroku_deployment = False #This determines if our app is being run locally or on heroku. If it's on heroku we'll want to act differently than local execution.
+
 execution_interval = 300 #This is the time in seconds between execution. If this is too low we will double comment because as reddit is adding our comment, we're checking again to see if it's there
 comment_rate_limit = 20 #This is the time in seconds the bot waits before trying to post annother comment.
 post_analyze_limit = 10 #This is the number of posts we want to look at for each call
@@ -128,13 +130,18 @@ def main():
     #subreddit = r.get_subreddit('SCNewsHelper') #Use this subreddit to test.
     __login(r)
 
-    while True:
-        #Add a try statement here eventually to handle exceptions TMT
+    if heroku_deployment is False:
+
+        while True:
+            #Add a try statement here eventually to handle exceptions TMT
+            add_new_comment(r, subreddit, post_analyze_limit)
+            print "Execution End. Waiting %s seconds before next execution : %s \n" % \
+            (str(execution_interval), time.asctime( time.localtime(time.time()) ))
+            print "_________________________________________________________________" + "\n"
+            time.sleep(execution_interval)
+
+    else:
         add_new_comment(r, subreddit, post_analyze_limit)
-        print "Execution End. Waiting %s seconds before next execution : %s \n" % \
-        (str(execution_interval), time.asctime( time.localtime(time.time()) ))
-        print "_________________________________________________________________" + "\n"
-        time.sleep(execution_interval)
 
 
 if __name__ == '__main__':
