@@ -28,13 +28,13 @@ class diffbotClient(object):
     base_url = 'http://api.diffbot.com/'
 
     # Makes the request to the diffbot api
-    def request(self, url, api, token = diffbot_api_token, version = 3):
+    def request(self, url, api, post_id, token = diffbot_api_token, version = 3):
 
         # Returns a python object containing the requested resource from the diffbot api
         payload = {"url": url, "token": token}
 
         try:
-            print "Requesting response from {0} : {1}".format(self.base_url, time.asctime( time.localtime(time.time()) ))
+            print "Requesting response from {0} for Post ID: {1} : {2}".format(self.base_url, post_id, time.asctime( time.localtime(time.time()) ))
             #response.raise_for_status() #Eventually include to check for HTML Server Response Errors TMT
             response = requests.get(self.format_url(api, version), params=payload)
             json_data = response.json()
@@ -88,7 +88,7 @@ class diffbotClient(object):
 
     # Returns the image url associated with an article
     @staticmethod
-    def get_article_image_url(json_data):
+    def get_article_image_url(json_data, post_id):
 
         # This method fixes links that will be posted to reddit. Links that contain parentheses have issues as defined here: http://www.reddit.com/wiki/commenting
         def reddit_html_link_fixer(orig_string):
@@ -111,8 +111,8 @@ class diffbotClient(object):
 
         except:
 
-            print "Retrival of image tag failed : %s" % \
-            (time.asctime( time.localtime(time.time()) ))
+            print "Retrival of image tag failed for post with post ID: %s : %s" % \
+            (post_id, time.asctime( time.localtime(time.time()) ))
             return None
 
         return reddit_html_link_fixer(article_image_url)

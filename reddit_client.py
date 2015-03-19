@@ -20,8 +20,8 @@ post_analyze_limit = 10 #This is the number of posts we want to look at for each
 analyzed_posts = [] #This array holds the post ids of posts that we tried to add comments to but failed (either b/c of an exception or we have already commented). We keep this to stop from calling the API too many times if we've already failed, or to stop from the coninual retrial to add a comment. The only exceiption to this should be if we are rate limited.
 rate_limit_error = 'RateLimitExceeded'
 user_agent = "South Carolina News Content Commenter : v1.0 (by /u/a_soy_milkshake)" #This is our user_agent we use to access reddit
-subreddit_of_interest = 'southcarolina'
-#subreddit_of_interest = 'SCNewsHelper' #Use this subreddit to test
+#subreddit_of_interest = 'southcarolina'
+subreddit_of_interest = 'SCNewsHelper' #Use this subreddit to test
 
 # Gets the login credentials from either locally or remotely depending on deployment
 def __get_login_credentials():

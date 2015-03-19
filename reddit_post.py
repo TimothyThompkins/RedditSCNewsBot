@@ -92,11 +92,11 @@ class redditPost:
         diffbot = diffbotClient() # Make a new diffbot client
 
         api = "article" # Set the type of web content we'll be analyzing (always article in this case)
-        response = diffbot.request(url, api) # Returns the json request
+        response = diffbot.request(url, api, self.post_id) # Returns the json request
 
         article_title = diffbot.get_article_title(response) # Returns the article title from the json request
         article_text = diffbot.get_article_text(response) # Returns the article text from the json request
-        article_image_url = diffbot.get_article_image_url(response) #Returns the article image from the json request
+        article_image_url = diffbot.get_article_image_url(response, self.post_id) #Returns the article image from the json request
 
         if (len(article_text) > character_post_min) and (len(article_text) < character_post_max): #We've got to have at least 10 characters, that's probably a sentence's worth, otherwise don't post because there's probably some other issue. If there's more than 5000 characters, we don't want to post that because it's way to big.
 
