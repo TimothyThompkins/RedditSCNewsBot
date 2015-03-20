@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 ## Execution
 
-If being run locally ensure that you change the local_deployment status in the file herokuDeployment.py as is shown below:
+If being run locally ensure that you change the *local_deployment* status in the file herokuDeployment.py as is shown below:
 
 ```
 local_deployment = True
