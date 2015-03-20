@@ -7,21 +7,22 @@
 import sys
 import threading
 import time
+import re
 import os
 
 import praw
 from reddit_post import redditPost
 from heroku_deployment import herokuDeployment
 
-execution_interval = 300 #This is the time in seconds between execution. If this is too low we will double comment because as reddit is adding our comment, we're checking again to see if it's there
+execution_interval = 100#300 #This is the time in seconds between execution. If this is too low we will double comment because as reddit is adding our comment, we're checking again to see if it's there
 comment_rate_limit = 20 #This is the time in seconds the bot waits before trying to post annother comment.
 post_analyze_limit = 10 #This is the number of posts we want to look at for each call
 
 analyzed_posts = [] #This array holds the post ids of posts that we tried to add comments to but failed (either b/c of an exception or we have already commented). We keep this to stop from calling the API too many times if we've already failed, or to stop from the coninual retrial to add a comment. The only exceiption to this should be if we are rate limited.
 rate_limit_error = 'RateLimitExceeded'
 user_agent = "South Carolina News Content Commenter : v1.0 (by /u/a_soy_milkshake)" #This is our user_agent we use to access reddit
-subreddit_of_interest = 'southcarolina'
-#subreddit_of_interest = 'SCNewsHelper' #Use this subreddit to test
+#subreddit_of_interest = 'southcarolina'
+subreddit_of_interest = 'SCNewsHelper' #Use this subreddit to test
 
 # Gets the login credentials from either locally or remotely depending on deployment
 def __get_login_credentials():
@@ -76,15 +77,22 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
     (str(post_analyze_limit), str(subreddit), time.asctime( time.localtime(time.time()) ))
     submission_generator = subreddit.get_new(limit = post_analyze_limit) #This gets the first "post_analyze_limit" posts and creates a new object for each one
 
-    for i, submission in enumerate(submission_generator):
+    #for i, submission in enumerate(submission_generator):
+    for submission in submission_generator:
+        comment_authors = []
         flair_text = str(submission.link_flair_text)
         post_url = str(submission.url)
         post_id = str(submission.id)
-        submission = reddit_object.get_submission(submission_id = post_id)
+        comments = submission.comments
+        submission_instance = reddit_object.get_submission(submission_id = post_id)
+
+        #Look through all the comments and get each author, put each one into an array and format author name
+        for current_comment in comments:
+            comment_authors.append(current_comment.author.name) #.name returns comment authors as string
 
         #This checks to see if any of the posts that have been declared "analyzed" are in our most recent pull
         if post_id not in analyzed_posts:
-            reddit_post_submissions.append(redditPost(flair_text, post_url, post_id, submission)) #This creates an array with a reddit object equal to post_analyze_limit
+            reddit_post_submissions.append(redditPost(flair_text, post_url, post_id, submission_instance, comment_authors)) #This creates an array with a reddit object equal to post_analyze_limit
 
     #We want to reverse the array because if we do get rate limited and have to wait to comment again, if we start commenting on the last post (oldest of the newest), if someone adds a new post during that time, we won't have missed the last one.
     reddit_post_submissions = list(reversed(reddit_post_submissions))
@@ -92,15 +100,16 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
     if (len(reddit_post_submissions) > 0):
 
         for i, current_post in enumerate(reddit_post_submissions):
-            article_content = current_post.check_comment_status(username)
+            comment_status, article_content = current_post.check_comment_status(username)
+            #article_content = current_post.check_comment_status(username)
 
-            if article_content is not None:
+            if comment_status is True:
                 print "Attempting to add comment to post with post id: %s : %s" % \
                 (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
                 try:
                     #print article_content #This is for testing to look at the article content
-                    current_post.get_submission().add_comment(article_content)
+                    current_post.get_submission_instance_current().add_comment(article_content)
                     print "Added comment to post with post id: %s : %s \n" % \
                     (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
@@ -126,6 +135,11 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
                         print "Waiting %s seconds before attempting to comment again : %s \n" % \
                         (str(comment_rate_limit), time.asctime( time.localtime(time.time()) ))
                         time.sleep(comment_rate_limit) #This is to prevent rate limiting. It may not even be necessary.
+
+            #The difference here is that we don't add the post to the analyzed post list b/c the correct flair might be added later
+            elif(article_content == 'no_flair'):
+                print "No comment was added to post with post id: %s : %s \n" % \
+                (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
             else:
                 __add_analyzed_post_id(str(current_post.get_post_ID())) #Add post_id to analyzed list so we don't look at it again
