@@ -68,7 +68,6 @@ class redditPost:
         if unapproved_news_source is False:
 
             if (has_relevant_flair or approved_news_source):
-
                 #Check here to see if bot user name is in list of comment authors in post
                 if USERNAME not in self.comment_authors:
                     reddit_comment_content = self.set_comment_content()
@@ -93,6 +92,11 @@ class redditPost:
                 if self.post_flair == 'None':
                     print "No comment content set. Post has NO flair and is not an approved source. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
                     reddit_comment_content = 'no_flair'
+                    return (False, reddit_comment_content)
+
+                else:
+                    print "No comment content set. Post has WRONG flair and is not an approved source. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
+                    reddit_comment_content = 'wrong_flair'
                     return (False, reddit_comment_content)
 
             else:
