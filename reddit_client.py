@@ -45,16 +45,15 @@ def __login(reddit_object):
     USERNAME, PASSWORD = __get_login_credentials()
 
     try:
-        print "Logging in to reddit as {0} : {1} \n".format(USERNAME, 'testingMYWHAT')
+        print "Logging in to reddit as {0} : {1} \n".format(USERNAME, time.asctime( time.localtime(time.time()) ))
         reddit_object.login(username=USERNAME, password=PASSWORD)
         return USERNAME
 
     except:
         message = __exception_message()
         login_wait_period = 20
-        #print "Login Failed. Retrying in " + str(login_wait_period) + " seconds : " + 'testingMYWHAT' + "\n"
         print "Login Failed. Threw an %s error. Retrying in %s seconds : %s \n" % \
-        (message, str(login_wait_period), 'testingMYWHAT')
+        (message, str(login_wait_period), time.asctime( time.localtime(time.time()) ))
         time.sleep(login_wait_period)
         __login(reddit_object)
 
@@ -74,7 +73,7 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
     reddit_post_submissions = []
 
     print "Pulling last %s posts from new on /r/%s : %s \n" % \
-    (str(post_analyze_limit), str(subreddit), 'testingMYWHAT')
+    (str(post_analyze_limit), str(subreddit), time.asctime( time.localtime(time.time()) ))
     submission_generator = subreddit.get_new(limit = post_analyze_limit) #This gets the first "post_analyze_limit" posts and creates a new object for each one
 
     #for i, submission in enumerate(submission_generator):
@@ -105,25 +104,25 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
 
             if comment_status is True:
                 print "Attempting to add comment to post with post id: %s : %s" % \
-                (str(current_post.get_post_ID()), 'testingMYWHAT')
+                (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
                 try:
                     #print article_content #This is for testing to look at the article content
                     current_post.get_submission_instance_current().add_comment(article_content)
                     print "Added comment to post with post id: %s : %s \n" % \
-                    (str(current_post.get_post_ID()), 'testingMYWHAT')
+                    (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
                     #No need to wait for next post if we're already at the last post.
                     if i is not (post_analyze_limit-1):
                         print "Waiting %s seconds before attempting to comment again : %s \n" % \
-                        (str(comment_rate_limit), 'testingMYWHAT')
+                        (str(comment_rate_limit), time.asctime( time.localtime(time.time()) ))
                         time.sleep(comment_rate_limit) #This is to prevent rate limiting. It may not even be necessary.
 
                 except:
                     message = __exception_message()
 
                     print "Comment addition to post with post id: %s failed : %s \n" % \
-                    (str(current_post.get_post_ID()), 'testingMYWHAT')
+                    (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
                     #If it's an RateLimitExceeded error it means we may have reached our rate limit, so we need to wait until we can comment again. In that case don't add the post to the analyzed post
 
@@ -133,22 +132,22 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
                     #No need to wait for next post if we're already at the last post.
                     if i is not (post_analyze_limit-1):
                         print "Waiting %s seconds before attempting to comment again : %s \n" % \
-                        (str(comment_rate_limit), 'testingMYWHAT')
+                        (str(comment_rate_limit), time.asctime( time.localtime(time.time()) ))
                         time.sleep(comment_rate_limit) #This is to prevent rate limiting. It may not even be necessary.
 
             #The difference here is that we don't add the post to the analyzed post list b/c the correct flair might be added later
             elif(article_content == 'no_flair'):
                 print "No comment was added to post with post id: %s : %s \n" % \
-                (str(current_post.get_post_ID()), 'testingMYWHAT')
+                (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
             else:
                 __add_analyzed_post_id(str(current_post.get_post_ID())) #Add post_id to analyzed list so we don't look at it again
                 print "No comment was added to post with post id: %s : %s \n" % \
-                (str(current_post.get_post_ID()), 'testingMYWHAT')
+                (str(current_post.get_post_ID()), time.asctime( time.localtime(time.time()) ))
 
     else:
         print "No new posts have been added in the last %s seconds : %s \n" % \
-        (str(execution_interval), 'testingMYWHAT')
+        (str(execution_interval), time.asctime( time.localtime(time.time()) ))
 
 
 def main():
@@ -161,7 +160,7 @@ def main():
         #Add a try statement here eventually to handle exceptions TMT
         __add_new_comment(r, subreddit, post_analyze_limit, username)
         print "Execution End. Waiting %s seconds before next execution : %s \n" % \
-        (str(execution_interval), 'testingMYWHAT')
+        (str(execution_interval), time.asctime( time.localtime(time.time()) ))
         print "_________________________________________________________________" + "\n"
         time.sleep(execution_interval)
 
