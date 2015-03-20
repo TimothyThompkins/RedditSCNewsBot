@@ -4,3 +4,11 @@
 
 class herokuDeployment(object):
     local_deployment = False
+
+    @staticmethod
+    def get_time_stamp(self):
+        if local_deployment is True:
+            return time.asctime( time.localtime(time.time()) )
+
+        else:
+            return ''
