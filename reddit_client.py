@@ -87,12 +87,19 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
 
         #Look through all the comments and get each author, put each one into an array and format author name
         for current_comment in comments:
-            comment_authors.append(current_comment.author.name) #.name returns comment authors as string
+            if current_comment.author:
+                name = current_comment.author.name #.name returns comment authors as string
+            else:
+                name = '[deleted]' # or whatever value you want to use
+
+            comment_authors.append(name) #.name returns comment authors as string
+            print name
 
         #This checks to see if any of the posts that have been declared "analyzed" are in our most recent pull
         if post_id not in analyzed_posts:
             reddit_post_submissions.append(redditPost(flair_text, post_url, post_id, submission_instance, comment_authors)) #This creates an array with a reddit object equal to post_analyze_limit
 
+    pause = raw_input()
     #We want to reverse the array because if we do get rate limited and have to wait to comment again, if we start commenting on the last post (oldest of the newest), if someone adds a new post during that time, we won't have missed the last one.
     reddit_post_submissions = list(reversed(reddit_post_submissions))
 
