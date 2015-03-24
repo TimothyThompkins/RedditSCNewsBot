@@ -93,7 +93,6 @@ def __add_new_comment(reddit_object, subreddit, post_analyze_limit, username):
                 name = '[deleted]' # or whatever value you want to use
 
             comment_authors.append(name) #.name returns comment authors as string
-            print name
 
         #This checks to see if any of the posts that have been declared "analyzed" are in our most recent pull
         if post_id not in analyzed_posts:
