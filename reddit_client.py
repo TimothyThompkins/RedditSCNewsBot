@@ -7,7 +7,7 @@
 import sys
 import threading
 import time
-import re
+import re # This is not needed I don't think
 import os
 
 import praw

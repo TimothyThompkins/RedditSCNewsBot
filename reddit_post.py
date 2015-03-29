@@ -13,8 +13,9 @@ relevant_flair= ['news' , 'sports']
 news_sources = ['thestate', 'yahoo', 'myrtlebeachonline', 'nbc', 'wspa', 'cbs', 'greenvilleonline', 'theguardian', 'enquirehearld', 'huffpost','wcnc', 'cnn', 'islandpacket', 'postandcourier', 'greenvilleonline', 'goupstate', 'hearldonline', 'free-times', 'aikenstandard', 'charlestoncitypaper', 'myrtlebeachonline', 'charlotteobserver', 'nbcnews', 'cbsnews', 'cnn', 'wbtw', 'washingtontimes', 'foxnews', 'npr', 'wyff4', 'carolina live', 'usatoday', 'wjcl', 'live5news', 'foxcarolina', 'wistv', 'rawstory', 'thenonprofittimes', 'nytimes', 'nydailynews', 'abcnews4', 'washingtonpost', 'wltx', 'c-span', 'msnbc', 'wmbfnews', 'charlotteobserver', 'weeklystandard', 'politico', 'wncn', 'fitsnews', 'dailykos', 'nbc4i', 'forbes', 'reuters', 'cbs46', 'wjbf', 'moultrienews', 'wsoctv', 'indexjournal', 'espn', 'deadspin']
 
 blacklist_news_sources = []
-#Our comment must be between these ranges in order to post
-character_post_min = 40
+
+# The number of characters in our comment must be between these ranges in order to post
+character_post_min = 100
 character_post_max = 6000
 
 class redditPost:
@@ -77,7 +78,7 @@ class redditPost:
                         return (True, reddit_comment_content)
 
                     else:
-                        print "No comment content set. Character count out of range. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
+                        print "No comment content set. Problem with comment content. Post ID: {0} : {1} ".format(self.post_id, time.asctime( time.localtime(time.time()) ))
                         reddit_comment_content = 'character_count'
                         return (False, reddit_comment_content)
 
@@ -118,34 +119,41 @@ class redditPost:
         api = "article" # Set the type of web content we'll be analyzing (always article in this case)
         response = diffbot.request(url, api, self.post_id) # Returns the json request
 
-        article_title = diffbot.get_article_title(response) # Returns the article title from the json request
-        article_text = diffbot.get_article_text(response) # Returns the article text from the json request
+        article_title = diffbot.get_article_title(response, self.post_id) # Returns the article title from the json request
+        article_text = diffbot.get_article_text(response, self.post_id) # Returns the article text from the json request
         article_image_url = diffbot.get_article_image_url(response, self.post_id) #Returns the article image from the json request
 
-        if (len(article_text) > character_post_min) and (len(article_text) < character_post_max): #We've got to have at least min number of characters, that's probably a sentence's worth, otherwise don't post because there's probably some other issue. If there's more than 5000 characters, we don't want to post that because it's way to big.
+        if (article_text is not None):
+            if (len(article_text) > character_post_min) and (len(article_text) < character_post_max): #We've got to have at least min number of characters, that's probably a sentence's worth, otherwise don't post because there's probably some other issue. If there's more than 5000 characters, we don't want to post that because it's way to big.
 
-            #Check to see if we have an image stored in article_image_url. If so post one link, if no post the other. Note, I come across very few news sources without articles, but this is completely dependent on what ever the text extractor API returns. It could be something completly unrelated.
-            if article_image_url is not None:
-                my_comment_content = "**%s**\n \n [Image](%s) \n \n %s \n \n*This comment was made by a bot. Please post bugs and comments to /r/SCNewsHelper*" % \
-                (article_title, article_image_url, article_text)
+                #Check to see if we have an image stored in article_image_url. If so post one link, if no post the other. Note, I come across very few news sources without articles, but this is completely dependent on what ever the text extractor API returns. It could be something completly unrelated.
+                if article_image_url is not None:
+                    my_comment_content = "**%s**\n \n [Image](%s) \n \n %s \n \n*This comment was made by a bot. Please post bugs and comments to /r/SCNewsHelper*" % \
+                    (article_title, article_image_url, article_text)
 
+                    return my_comment_content
+
+                else:
+                    my_comment_content = "**%s**\n \n %s \n \n*This comment was made by a bot. Please post bugs and comments to /r/SCNewsHelper*" % \
+                    (article_title, article_text)
+
+                    return my_comment_content
+
+            elif (len(article_text) < character_post_min):
+                print "Comment character count less than %s. Post ID: %s : %s" % \
+                (str(character_post_min), str(self.post_id), time.asctime( time.localtime(time.time()) ))
+                my_comment_content = None
                 return my_comment_content
 
             else:
-                my_comment_content = "**%s**\n \n %s \n \n*This comment was made by a bot. Please post bugs and comments to /r/SCNewsHelper*" % \
-                (article_title, article_text)
-
+                print "Comment character count greater than %s. Post ID: %s : %s" % \
+                (str(character_post_max), str(self.post_id), time.asctime( time.localtime(time.time()) ))
+                my_comment_content = None
                 return my_comment_content
 
-        elif (len(article_text) < character_post_min):
-            print "Comment character count less than %s. Post ID: %s : %s" % \
-            (str(character_post_min), str(self.post_id), time.asctime( time.localtime(time.time()) ))
-            my_comment_content = None
-            return my_comment_content
-
         else:
-            print "Comment character count greater than %s. Post ID: %s : %s" % \
-            (str(character_post_max), str(self.post_id), time.asctime( time.localtime(time.time()) ))
+            print "Article Text is 'None'. Post ID: %s : %s" % \
+            (str(self.post_id), time.asctime( time.localtime(time.time()) ))
             my_comment_content = None
             return my_comment_content
 
